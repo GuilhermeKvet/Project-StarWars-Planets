@@ -4,9 +4,20 @@ import context from '../context/context';
 function Filters() {
   const {
     planets,
+    data,
     setData,
-    setFilterByNumericValues,
+    // filterByNumericValues,
+    // setFilterByNumericValues,
   } = useContext(context);
+
+  const [columnsList, setColumnsList] = useState([
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ]);
+
   const [filterInput, setFilterByName] = useState(
     {
       name: '',
@@ -24,6 +35,35 @@ function Filters() {
     setData(newData);
   };
 
+  const newColumnList = () => {
+    const { column } = filterInput;
+    const list = columnsList.filter((item) => item !== column);
+    setColumnsList(list);
+    setFilterByName((prevState) => ({ ...prevState, column: list[0] }));
+  };
+
+  const filterCategory = () => {
+    const { comparison, value, column } = filterInput;
+    const newData = data.filter((planet) => {
+      if (comparison === 'maior que') {
+        return +(planet[column]) > +(value);
+      } if (comparison === 'menor que') {
+        return +(planet[column]) < +(value);
+      }
+      if (comparison === 'igual a') {
+        return +(planet[column]) === +(value);
+      }
+      return false;
+    });
+    setData(newData);
+    newColumnList();
+    // setFilterByNumericValues([...filterByNumericValues, {
+    //   column: filterInput.column,
+    //   comparison: filterInput.comparison,
+    //   value: filterInput.value,
+    // }]);
+  };
+
   const handleChange = ({ target }) => {
     const { name, value } = target;
     setFilterByName({
@@ -31,24 +71,6 @@ function Filters() {
       [name]: value,
     });
     if (name === 'name') filterName(value);
-  };
-
-  const filterCategory = () => {
-    const { comparison, value, column } = filterInput;
-    const newData = planets.filter((planet) => {
-      if (comparison === 'maior que') {
-        return +(planet[column]) > +(value);
-      } if (comparison === 'menor que') {
-        return +(planet[column]) < +(value);
-      }
-      return +(planet[column]) === +(value);
-    });
-    setData(newData);
-    setFilterByNumericValues([{
-      column: filterInput.column,
-      comparison: filterInput.comparison,
-      value: filterInput.value,
-    }]);
   };
 
   return (
@@ -71,11 +93,9 @@ function Filters() {
           value={ filterInput.column }
           name="column"
         >
-          <option value="population" key="1">population</option>
-          <option value="orbital_period" key="2">orbital_period</option>
-          <option value="diameter" key="3">diameter</option>
-          <option value="rotation_period" key="4">rotation_period</option>
-          <option value="surface_water" key="5">surface_water</option>
+          {columnsList.map((column) => (
+            <option value={ column } key="1">{column}</option>
+          ))}
         </select>
       </label>
       <label htmlFor="filterByComparison">
