@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import context from '../context/context';
 
 function Table() {
-  const { data } = useContext(context);
+  const { data, name } = useContext(context);
   const [headers, setHeaders] = useState([]);
   useEffect(() => {
     if (data.length > 0) {
@@ -21,13 +21,14 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {data.length > 0 && data.map((values, index) => (
-            <tr key={ index }>
-              {Object.values(values).map((value) => (
-                <td key={ Math.random() }>{value}</td>
-              ))}
-            </tr>
-          ))}
+          {data.length > 0 && data.filter((filter) => filter.name.includes(name))
+            .map((values, index) => (
+              <tr key={ index }>
+                {Object.values(values).map((value) => (
+                  <td key={ Math.random() }>{value}</td>
+                ))}
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

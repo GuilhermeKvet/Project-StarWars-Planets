@@ -2,38 +2,27 @@ import React, { useContext, useState } from 'react';
 import context from '../context/context';
 
 function Filters() {
-  const {
-    planets,
-    data,
-    setData,
-    filterByNumericValues,
-    setFilterByNumericValues,
-  } = useContext(context);
+  const INICIAL_STATE = {
+    name: '',
+    column: 'population',
+    comparison: 'maior que',
+    value: '0',
+  };
 
-  const [columnsList, setColumnsList] = useState([
-    'population',
-    'orbital_period',
-    'diameter',
-    'rotation_period',
-    'surface_water',
-  ]);
+  const { planets, data, setName, setData,
+    filterByNumericValues, setFilterByNumericValues } = useContext(context);
+
+  const [columnsList, setColumnsList] = useState(['population',
+    'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
 
   const [bkpColumns] = useState(columnsList);
 
-  const [filterInput, setFilterByName] = useState(
-    {
-      name: '',
-      column: 'population',
-      comparison: 'maior que',
-      value: '0',
-    },
-  );
+  const [filterInput, setFilterInput] = useState(INICIAL_STATE);
 
   const newColumnList = () => {
-    const { column } = filterInput;
-    const list = columnsList.filter((item) => item !== column);
+    const list = columnsList.filter((item) => item !== filterInput.column);
     setColumnsList(list);
-    setFilterByName((prevState) => ({ ...prevState, column: list[0] }));
+    setFilterInput((prevState) => ({ ...prevState, column: list[0] }));
   };
 
   const checkCondition = (api, comparison, value, column) => {
@@ -43,18 +32,7 @@ function Filters() {
       } if (comparison === 'menor que') {
         return +(planet[column]) < +(value);
       }
-      if (comparison === 'igual a') {
-        return +(planet[column]) === +(value);
-      }
-      return false;
-    });
-    setData(newData);
-  };
-
-  const filterName = (value) => {
-    const newData = planets.filter((planet) => {
-      if (planet.name.includes(value)) return planet;
-      return false;
+      return +(planet[column]) === +(value);
     });
     setData(newData);
   };
@@ -89,11 +67,11 @@ function Filters() {
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
-    setFilterByName({
+    setFilterInput({
       ...filterInput,
       [name]: value,
     });
-    if (name === 'name') filterName(value);
+    if (name === 'name') setName(value);
   };
 
   return (

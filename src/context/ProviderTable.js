@@ -7,19 +7,22 @@ function ProviderTable({ children }) {
   const [data, setData] = useState([]);
   const [filterByNumericValues, setFilterByNumericValues] = useState([]);
 
+  const fetchApi = async () => {
+    const response = await fetch('https://swapi-trybe.herokuapp.com/api/planets/');
+    const newData = await response.json();
+    const newObj = newData.results.map((planet) => {
+      delete planet.residents;
+      return planet;
+    });
+    setData(newObj);
+    setPlanets(newObj);
+  };
+
   useEffect(() => {
-    const fetchApi = async () => {
-      const response = await fetch('https://swapi-trybe.herokuapp.com/api/planets/');
-      const newData = await response.json();
-      const newObj = newData.results.map((planet) => {
-        delete planet.residents;
-        return planet;
-      });
-      setData(newObj);
-      setPlanets(newObj);
-    };
     fetchApi();
   }, []);
+
+  const [name, setName] = useState('');
 
   return (
     <context.Provider
@@ -27,9 +30,10 @@ function ProviderTable({ children }) {
         planets,
         data,
         setData,
-        setPlanets,
         filterByNumericValues,
         setFilterByNumericValues,
+        name,
+        setName,
       } }
     >
       {children}
@@ -38,7 +42,7 @@ function ProviderTable({ children }) {
 }
 
 ProviderTable.propTypes = {
-  children: PropTypes.objectOf.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 export default ProviderTable;
