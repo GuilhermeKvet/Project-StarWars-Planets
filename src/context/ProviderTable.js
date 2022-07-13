@@ -27,6 +27,7 @@ function ProviderTable({ children }) {
         planets,
         data,
         setData,
+        setPlanets,
         filterByNumericValues,
         setFilterByNumericValues,
       } }

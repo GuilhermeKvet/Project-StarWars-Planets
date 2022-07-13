@@ -6,8 +6,8 @@ function Filters() {
     planets,
     data,
     setData,
-    // filterByNumericValues,
-    // setFilterByNumericValues,
+    filterByNumericValues,
+    setFilterByNumericValues,
   } = useContext(context);
 
   const [columnsList, setColumnsList] = useState([
@@ -18,6 +18,8 @@ function Filters() {
     'surface_water',
   ]);
 
+  const [bkpColumns] = useState(columnsList);
+
   const [filterInput, setFilterByName] = useState(
     {
       name: '',
@@ -27,14 +29,6 @@ function Filters() {
     },
   );
 
-  const filterName = (value) => {
-    const newData = planets.filter((planet) => {
-      if (planet.name.includes(value)) return planet;
-      return false;
-    });
-    setData(newData);
-  };
-
   const newColumnList = () => {
     const { column } = filterInput;
     const list = columnsList.filter((item) => item !== column);
@@ -42,9 +36,8 @@ function Filters() {
     setFilterByName((prevState) => ({ ...prevState, column: list[0] }));
   };
 
-  const filterCategory = () => {
-    const { comparison, value, column } = filterInput;
-    const newData = data.filter((planet) => {
+  const checkCondition = (api, comparison, value, column) => {
+    const newData = api.filter((planet) => {
       if (comparison === 'maior que') {
         return +(planet[column]) > +(value);
       } if (comparison === 'menor que') {
@@ -56,12 +49,42 @@ function Filters() {
       return false;
     });
     setData(newData);
+  };
+
+  const filterName = (value) => {
+    const newData = planets.filter((planet) => {
+      if (planet.name.includes(value)) return planet;
+      return false;
+    });
+    setData(newData);
+  };
+
+  const filterCategory = () => {
+    const { comparison, value, column } = filterInput;
+    checkCondition(data, comparison, value, column);
     newColumnList();
-    // setFilterByNumericValues([...filterByNumericValues, {
-    //   column: filterInput.column,
-    //   comparison: filterInput.comparison,
-    //   value: filterInput.value,
-    // }]);
+    setFilterByNumericValues([...filterByNumericValues, {
+      column: filterInput.column,
+      comparison: filterInput.comparison,
+      value: filterInput.value,
+      filterPlanets: data,
+    }]);
+  };
+
+  const removeFilter = () => {
+    if (filterByNumericValues.length <= 1) return setData(planets);
+    const {
+      column,
+      comparison,
+      value,
+      filterPlanets } = filterByNumericValues[filterByNumericValues.length - 2];
+    checkCondition(filterPlanets, comparison, value, column);
+  };
+
+  const removeAllFilters = () => {
+    setFilterByNumericValues([]);
+    setColumnsList(bkpColumns);
+    setData(planets);
   };
 
   const handleChange = ({ target }) => {
@@ -94,7 +117,7 @@ function Filters() {
           name="column"
         >
           {columnsList.map((column) => (
-            <option value={ column } key="1">{column}</option>
+            <option value={ column } key={ column }>{column}</option>
           ))}
         </select>
       </label>
@@ -127,6 +150,32 @@ function Filters() {
         onClick={ filterCategory }
       >
         FILTRAR
+      </button>
+      <ul>
+        {filterByNumericValues && filterByNumericValues.map((filter) => (
+          <li key={ Math.random() } data-testid="filter">
+            <p>{filter.column}</p>
+            <p>{filter.comparison}</p>
+            <p>{filter.value}</p>
+            <button
+              onClick={ () => {
+                setFilterByNumericValues(filterByNumericValues
+                  .filter((value) => value.column !== filter.column));
+                removeFilter();
+              } }
+              type="button"
+            >
+              X
+            </button>
+          </li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        data-testid="button-remove-filters"
+        onClick={ removeAllFilters }
+      >
+        Remover todas filtragens
       </button>
     </div>
   );
