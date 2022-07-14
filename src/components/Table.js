@@ -24,9 +24,19 @@ function Table() {
           {data.length > 0 && data.filter((filter) => filter.name.includes(name))
             .map((values, index) => (
               <tr key={ index }>
-                {Object.values(values).map((value) => (
-                  <td key={ Math.random() }>{value}</td>
-                ))}
+                <td data-testid="planet-name">{values.name}</td>
+                <td>{values.rotation_period}</td>
+                <td>{values.orbital_period}</td>
+                <td>{values.diameter}</td>
+                <td>{values.climate}</td>
+                <td>{values.gravity}</td>
+                <td>{values.terrain}</td>
+                <td>{values.surface_water}</td>
+                <td>{values.population}</td>
+                <td>{values.films}</td>
+                <td>{values.created}</td>
+                <td>{values.edited}</td>
+                <td>{values.url}</td>
               </tr>
             ))}
         </tbody>

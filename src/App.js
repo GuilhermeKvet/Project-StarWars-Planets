@@ -1,7 +1,6 @@
 import React from 'react';
 import ProviderTable from './context/ProviderTable';
 import Table from './components/Table';
-import './App.css';
 import Filters from './components/Filters';
 
 function App() {

@@ -96,15 +96,33 @@ describe('Testando componente Filter', () => {
     const tdFilter2 = await screen.findAllByRole("row");
     expect(tdFilter2).toHaveLength(11);
   });
-  test('Testa se ao remover um filtro, remove o column utilizado', async () => {
+  test('Testa se ao remover um filtro, remove o column utilizado', () => {
     render(<App />);
-    const optionPopulationColumn = await screen.findByRole("option", { name: /population/i });
-    const buttonFilter =  await screen.findByRole("button", { name: /FILTRAR/i });
-    expect(optionPopulationColumn).toBeInTheDocument();
+    const optionPopulationColumn = screen.getAllByTestId("optionsColumn");
+    const buttonFilter = screen.getByRole("button", { name: /FILTRAR/i });
+    expect(optionPopulationColumn[0]).toBeInTheDocument();
     userEvent.click(buttonFilter);
-    const removeFilter = await screen.findByRole("button", { name: /x/i });
+    const removeFilter = screen.getByRole("button", { name: /x/i });
     expect(removeFilter).toBeInTheDocument();
     userEvent.click(removeFilter);
-    expect(optionPopulationColumn).not.toBeInTheDocument();
+    expect(optionPopulationColumn[0]).not.toBeInTheDocument();
   });
+  test('Testa se os planetas ordenam corretamente', async () => {
+    render(<App/>);
+    const radioDESC = await screen.findByRole("radio", { name: /DESC/i });
+    const radioASC = await screen.findByRole("radio", { name: /ASC/i });
+    const buttonOrder = await screen.findByRole("button", { name: /ORDERNAR/i });
+    const optionColumnSort = await screen.findAllByTestId("orderColumn");
+    expect(radioASC).toBeInTheDocument();
+    expect(buttonOrder).toBeInTheDocument();
+    expect(optionColumnSort).toHaveLength(5);
+    expect(optionColumnSort[3].value).toBe("rotation_period");
+    userEvent.click(radioDESC);
+    userEvent.click(buttonOrder);
+    const planetsName = await screen.findAllByTestId("planet-name");
+    expect(planetsName[0]).toHaveTextContent('Coruscant');
+    userEvent.click(radioASC);
+    userEvent.click(buttonOrder);
+    expect(planetsName[0]).toHaveTextContent('Hoth');
+  })
 })

@@ -7,16 +7,17 @@ function Filters() {
     column: 'population',
     comparison: 'maior que',
     value: '0',
+    order: 'ASC',
+    columnOrder: 'population',
   };
 
   const { planets, data, setName, setData,
-    filterByNumericValues, setFilterByNumericValues } = useContext(context);
+    filterByNumericValues, setFilterByNumericValues,
+    setOrder, orderPlanets } = useContext(context);
 
   const [columnsList, setColumnsList] = useState(['population',
     'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
-
   const [bkpColumns] = useState(columnsList);
-
   const [filterInput, setFilterInput] = useState(INICIAL_STATE);
 
   const newColumnList = () => {
@@ -66,11 +67,16 @@ function Filters() {
   };
 
   const handleChange = ({ target }) => {
-    const { name, value } = target;
+    const { name, value, selectedOptions } = target;
     setFilterInput({
       ...filterInput,
       [name]: value,
     });
+    if (name === 'columnOrder') {
+      setOrder({ column: selectedOptions[0].value, sort: filterInput.order });
+    }
+    if (value === 'ASC') setOrder({ column: filterInput.columnOrder, sort: value });
+    if (value === 'DESC') setOrder({ column: filterInput.columnOrder, sort: value });
     if (name === 'name') setName(value);
   };
 
@@ -95,7 +101,13 @@ function Filters() {
           name="column"
         >
           {columnsList.map((column) => (
-            <option value={ column } key={ column }>{column}</option>
+            <option
+              data-testid="optionsColumn"
+              value={ column }
+              key={ column }
+            >
+              {column}
+            </option>
           ))}
         </select>
       </label>
@@ -129,6 +141,57 @@ function Filters() {
       >
         FILTRAR
       </button>
+      <div>
+        <label htmlFor="selectColumnOrder">
+          <select
+            id="selectColumnOrder"
+            data-testid="column-sort"
+            name="columnOrder"
+            value={ filterInput.columnOrder }
+            onChange={ handleChange }
+          >
+            {bkpColumns.map((column) => (
+              <option
+                data-testid="orderColumn"
+                value={ column }
+                key={ column }
+              >
+                {column}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label htmlFor="ASC">
+          <input
+            id="ASC"
+            name="order"
+            type="radio"
+            value="ASC"
+            data-testid="column-sort-input-asc"
+            onClick={ handleChange }
+            defaultChecked
+          />
+          Ascendente
+        </label>
+        <label htmlFor="DESC">
+          <input
+            id="DESC"
+            name="order"
+            type="radio"
+            value="DESC"
+            data-testid="column-sort-input-desc"
+            onClick={ handleChange }
+          />
+          Descendente
+        </label>
+        <button
+          type="button"
+          data-testid="column-sort-button"
+          onClick={ () => orderPlanets() }
+        >
+          ORDERNAR
+        </button>
+      </div>
       <ul>
         {filterByNumericValues && filterByNumericValues.map((filter) => (
           <li key={ Math.random() } data-testid="filter">
@@ -140,6 +203,7 @@ function Filters() {
                 setFilterByNumericValues(filterByNumericValues
                   .filter((value) => value.column !== filter.column));
                 removeFilter();
+                setColumnsList((prevState) => [...prevState, filter.column]);
               } }
               type="button"
             >
