@@ -1,4 +1,4 @@
--r requirements.txt   #todos que estão no requirements
-flake8                #linter
-black                 #formatador
-uvicorn               #servidor
+-r requirements.txt
+flake8==6.0.0
+black==23.1.0
+uvicorn==0.20.0
