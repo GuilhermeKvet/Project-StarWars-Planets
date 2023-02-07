@@ -1,0 +1,4 @@
+-r requirements.txt   #todos que estão no requirements
+flake8                #linter
+black                 #formatador
+uvicorn               #servidor
