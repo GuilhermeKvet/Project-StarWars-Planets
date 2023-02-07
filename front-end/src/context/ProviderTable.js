@@ -12,7 +12,7 @@ function ProviderTable({ children }) {
   const [name, setName] = useState('');
 
   const fetchApi = async () => {
-    const response = await fetch('https://swapi-trybe.herokuapp.com/api/planets/');
+    const response = await fetch('http://localhost:8000/api/planets/');
     const newData = await response.json();
     const newObj = newData.results.map((planet) => {
       delete planet.residents;
